@@ -112,7 +112,7 @@ export default function Navbar() {
   }
 
   const navItems = [
-    { label: "Events", href: "#" },
+    { label: "Events", href: "/events" },
     ...(user ? [{ label: "Create Event", href: "#" }] : []),
   ];
 

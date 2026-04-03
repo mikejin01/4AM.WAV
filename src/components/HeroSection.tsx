@@ -17,7 +17,7 @@ export default function HeroSection() {
         </h1>
 
         <Link
-          href="#"
+          href="/events"
           className="mt-4 border border-gold px-8 py-3 text-sm font-medium uppercase tracking-widest text-gold transition-all duration-300 hover:bg-gold hover:text-black"
         >
           See Events
