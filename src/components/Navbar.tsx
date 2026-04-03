@@ -62,7 +62,7 @@ function UserMenu({
             Profile
           </Link>
           <Link
-            href="#"
+            href="/tickets"
             onClick={() => setOpen(false)}
             className="block px-4 py-2.5 text-sm text-white/70 transition-colors hover:bg-white/5 hover:text-white"
           >
@@ -242,7 +242,7 @@ export default function Navbar() {
               </li>
               <li>
                 <Link
-                  href="#"
+                  href="/tickets"
                   onClick={() => setMenuOpen(false)}
                   className="text-2xl font-medium uppercase tracking-widest text-white transition-colors hover:text-gold"
                 >
