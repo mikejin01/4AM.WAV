@@ -1,16 +1,43 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Link from "next/link";
-
-const NAV_ITEMS = [
-  { label: "Events", href: "#" },
-  { label: "Login", href: "#" },
-  { label: "Create Event", href: "#" },
-];
+import type { User } from "@supabase/supabase-js";
+import { createClient } from "@/lib/supabase/client";
 
 export default function Navbar() {
   const [menuOpen, setMenuOpen] = useState(false);
+  const [user, setUser] = useState<User | null>(null);
+
+  useEffect(() => {
+    const supabase = createClient();
+
+    supabase.auth.getUser().then(({ data }) => {
+      setUser(data.user);
+    });
+
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange((_event, session) => {
+      setUser(session?.user ?? null);
+    });
+
+    return () => subscription.unsubscribe();
+  }, []);
+
+  async function handleSignOut() {
+    const supabase = createClient();
+    await supabase.auth.signOut();
+    setUser(null);
+    window.location.href = "/";
+  }
+
+  const navItems = [
+    { label: "Events", href: "#" },
+    ...(user
+      ? [{ label: "Create Event", href: "#" }]
+      : []),
+  ];
 
   return (
     <nav className="fixed top-0 left-0 right-0 z-40 flex items-center justify-between px-6 py-5 sm:px-10">
@@ -19,18 +46,33 @@ export default function Navbar() {
       </Link>
 
       {/* Desktop nav */}
-      <ul className="hidden gap-8 md:flex">
-        {NAV_ITEMS.map((item) => (
-          <li key={item.label}>
-            <Link
-              href={item.href}
-              className="text-sm font-medium uppercase tracking-widest text-white/80 transition-colors hover:text-gold"
-            >
-              {item.label}
-            </Link>
-          </li>
+      <div className="hidden items-center gap-8 md:flex">
+        {navItems.map((item) => (
+          <Link
+            key={item.label}
+            href={item.href}
+            className="text-sm font-medium uppercase tracking-widest text-white/80 transition-colors hover:text-gold"
+          >
+            {item.label}
+          </Link>
         ))}
-      </ul>
+
+        {user ? (
+          <button
+            onClick={handleSignOut}
+            className="text-sm font-medium uppercase tracking-widest text-white/80 transition-colors hover:text-gold"
+          >
+            Logout
+          </button>
+        ) : (
+          <Link
+            href="/login"
+            className="text-sm font-medium uppercase tracking-widest text-white/80 transition-colors hover:text-gold"
+          >
+            Login
+          </Link>
+        )}
+      </div>
 
       {/* Mobile hamburger */}
       <button
@@ -78,7 +120,7 @@ export default function Navbar() {
           </button>
         </div>
         <ul className="flex flex-1 flex-col items-center justify-center gap-10">
-          {NAV_ITEMS.map((item) => (
+          {navItems.map((item) => (
             <li key={item.label}>
               <Link
                 href={item.href}
@@ -89,6 +131,27 @@ export default function Navbar() {
               </Link>
             </li>
           ))}
+          <li>
+            {user ? (
+              <button
+                onClick={() => {
+                  setMenuOpen(false);
+                  handleSignOut();
+                }}
+                className="text-2xl font-medium uppercase tracking-widest text-white transition-colors hover:text-gold"
+              >
+                Logout
+              </button>
+            ) : (
+              <Link
+                href="/login"
+                onClick={() => setMenuOpen(false)}
+                className="text-2xl font-medium uppercase tracking-widest text-white transition-colors hover:text-gold"
+              >
+                Login
+              </Link>
+            )}
+          </li>
         </ul>
       </div>
     </nav>
