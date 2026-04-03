@@ -3,6 +3,9 @@
 import { useEffect, useRef, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { createClient } from "@/lib/supabase/client";
+import TicketModal from "./TicketModal";
 
 type TicketTier = {
   id: string;
@@ -90,8 +93,10 @@ function extractDominantColor(
 
 export default function EventDetail({ event }: { event: Event }) {
   const [bgColor, setBgColor] = useState("rgb(10, 5, 20)");
+  const [modalOpen, setModalOpen] = useState(false);
   const imgRef = useRef<HTMLImageElement>(null);
   const extractedRef = useRef(false);
+  const router = useRouter();
 
   useEffect(() => {
     if (!event.image_url || extractedRef.current) return;
@@ -244,7 +249,18 @@ export default function EventDetail({ event }: { event: Event }) {
                         : "TBA"}
                     </p>
                   </div>
-                  <button className="rounded-lg bg-gold px-6 py-2.5 text-sm font-bold uppercase tracking-wider text-black transition-colors hover:bg-gold-light">
+                  <button
+                    onClick={async () => {
+                      const supabase = createClient();
+                      const { data: { user } } = await supabase.auth.getUser();
+                      if (!user) {
+                        router.push("/login");
+                        return;
+                      }
+                      setModalOpen(true);
+                    }}
+                    className="rounded-lg bg-gold px-6 py-2.5 text-sm font-bold uppercase tracking-wider text-black transition-colors hover:bg-gold-light"
+                  >
                     {lowestTier && lowestTier.price_cents === 0
                       ? "RSVP"
                       : "Buy Now"}
@@ -281,6 +297,12 @@ export default function EventDetail({ event }: { event: Event }) {
           </div>
         </div>
       </div>
+
+      <TicketModal
+        event={event}
+        open={modalOpen}
+        onClose={() => setModalOpen(false)}
+      />
     </main>
   );
 }
