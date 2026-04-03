@@ -59,7 +59,7 @@ function formatPrice(tiers: TicketTier[]) {
 
 export default function EventCard({ event }: EventCardProps) {
   return (
-    <Link href={`#`} className="group block">
+    <Link href={`/events/${event.id}`} className="group block">
       <div className="overflow-hidden rounded-lg">
         <div className="relative aspect-square overflow-hidden bg-surface">
           {event.image_url ? (
