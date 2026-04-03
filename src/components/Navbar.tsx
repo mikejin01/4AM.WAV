@@ -1,9 +1,88 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
+import Image from "next/image";
 import Link from "next/link";
 import type { User } from "@supabase/supabase-js";
 import { createClient } from "@/lib/supabase/client";
+
+function UserMenu({
+  user,
+  onSignOut,
+}: {
+  user: User;
+  onSignOut: () => void;
+}) {
+  const [open, setOpen] = useState(false);
+  const menuRef = useRef<HTMLDivElement>(null);
+
+  const name =
+    user.user_metadata?.full_name ?? user.email?.split("@")[0] ?? "User";
+  const avatar: string | undefined = user.user_metadata?.avatar_url;
+
+  useEffect(() => {
+    function handleClickOutside(e: MouseEvent) {
+      if (menuRef.current && !menuRef.current.contains(e.target as Node)) {
+        setOpen(false);
+      }
+    }
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
+
+  return (
+    <div ref={menuRef} className="relative">
+      <button
+        onClick={() => setOpen(!open)}
+        className="flex items-center gap-2.5 rounded-full py-1 pl-1 pr-3 transition-colors hover:bg-white/10"
+      >
+        {avatar ? (
+          <Image
+            src={avatar}
+            alt={name}
+            width={32}
+            height={32}
+            className="rounded-full"
+          />
+        ) : (
+          <div className="flex h-8 w-8 items-center justify-center rounded-full bg-gold/20 text-sm font-bold text-gold">
+            {name.charAt(0).toUpperCase()}
+          </div>
+        )}
+        <span className="text-sm font-medium text-white/80">{name}</span>
+      </button>
+
+      {open && (
+        <div className="absolute right-0 top-full mt-2 w-44 overflow-hidden rounded-lg border border-white/10 bg-surface-light shadow-xl">
+          <Link
+            href="#"
+            onClick={() => setOpen(false)}
+            className="block px-4 py-2.5 text-sm text-white/70 transition-colors hover:bg-white/5 hover:text-white"
+          >
+            Profile
+          </Link>
+          <Link
+            href="#"
+            onClick={() => setOpen(false)}
+            className="block px-4 py-2.5 text-sm text-white/70 transition-colors hover:bg-white/5 hover:text-white"
+          >
+            Tickets
+          </Link>
+          <div className="border-t border-white/10" />
+          <button
+            onClick={() => {
+              setOpen(false);
+              onSignOut();
+            }}
+            className="block w-full px-4 py-2.5 text-left text-sm text-white/70 transition-colors hover:bg-white/5 hover:text-white"
+          >
+            Logout
+          </button>
+        </div>
+      )}
+    </div>
+  );
+}
 
 export default function Navbar() {
   const [menuOpen, setMenuOpen] = useState(false);
@@ -34,9 +113,7 @@ export default function Navbar() {
 
   const navItems = [
     { label: "Events", href: "#" },
-    ...(user
-      ? [{ label: "Create Event", href: "#" }]
-      : []),
+    ...(user ? [{ label: "Create Event", href: "#" }] : []),
   ];
 
   return (
@@ -58,19 +135,22 @@ export default function Navbar() {
         ))}
 
         {user ? (
-          <button
-            onClick={handleSignOut}
-            className="text-sm font-medium uppercase tracking-widest text-white/80 transition-colors hover:text-gold"
-          >
-            Logout
-          </button>
+          <UserMenu user={user} onSignOut={handleSignOut} />
         ) : (
-          <Link
-            href="/login"
-            className="text-sm font-medium uppercase tracking-widest text-white/80 transition-colors hover:text-gold"
-          >
-            Login
-          </Link>
+          <>
+            <Link
+              href="/login"
+              className="text-sm font-medium uppercase tracking-widest text-white/80 transition-colors hover:text-gold"
+            >
+              Login
+            </Link>
+            <Link
+              href="/signup"
+              className="rounded border border-gold px-4 py-1.5 text-sm font-medium uppercase tracking-widest text-gold transition-colors hover:bg-gold hover:text-black"
+            >
+              Create Account
+            </Link>
+          </>
         )}
       </div>
 
@@ -131,27 +211,78 @@ export default function Navbar() {
               </Link>
             </li>
           ))}
-          <li>
-            {user ? (
-              <button
-                onClick={() => {
-                  setMenuOpen(false);
-                  handleSignOut();
-                }}
-                className="text-2xl font-medium uppercase tracking-widest text-white transition-colors hover:text-gold"
-              >
-                Logout
-              </button>
-            ) : (
-              <Link
-                href="/login"
-                onClick={() => setMenuOpen(false)}
-                className="text-2xl font-medium uppercase tracking-widest text-white transition-colors hover:text-gold"
-              >
-                Login
-              </Link>
-            )}
-          </li>
+          {user ? (
+            <>
+              <li className="flex flex-col items-center gap-3">
+                {user.user_metadata?.avatar_url ? (
+                  <Image
+                    src={user.user_metadata.avatar_url}
+                    alt={user.user_metadata?.full_name ?? "User"}
+                    width={48}
+                    height={48}
+                    className="rounded-full"
+                  />
+                ) : (
+                  <div className="flex h-12 w-12 items-center justify-center rounded-full bg-gold/20 text-lg font-bold text-gold">
+                    {(user.user_metadata?.full_name ?? "U").charAt(0).toUpperCase()}
+                  </div>
+                )}
+                <span className="text-sm text-white/50">
+                  {user.user_metadata?.full_name ?? user.email}
+                </span>
+              </li>
+              <li>
+                <Link
+                  href="#"
+                  onClick={() => setMenuOpen(false)}
+                  className="text-2xl font-medium uppercase tracking-widest text-white transition-colors hover:text-gold"
+                >
+                  Profile
+                </Link>
+              </li>
+              <li>
+                <Link
+                  href="#"
+                  onClick={() => setMenuOpen(false)}
+                  className="text-2xl font-medium uppercase tracking-widest text-white transition-colors hover:text-gold"
+                >
+                  Tickets
+                </Link>
+              </li>
+              <li>
+                <button
+                  onClick={() => {
+                    setMenuOpen(false);
+                    handleSignOut();
+                  }}
+                  className="text-2xl font-medium uppercase tracking-widest text-white/50 transition-colors hover:text-white"
+                >
+                  Logout
+                </button>
+              </li>
+            </>
+          ) : (
+            <>
+              <li>
+                <Link
+                  href="/login"
+                  onClick={() => setMenuOpen(false)}
+                  className="text-2xl font-medium uppercase tracking-widest text-white transition-colors hover:text-gold"
+                >
+                  Login
+                </Link>
+              </li>
+              <li>
+                <Link
+                  href="/signup"
+                  onClick={() => setMenuOpen(false)}
+                  className="text-2xl font-medium uppercase tracking-widest text-gold transition-colors hover:text-gold-light"
+                >
+                  Create Account
+                </Link>
+              </li>
+            </>
+          )}
         </ul>
       </div>
     </nav>
