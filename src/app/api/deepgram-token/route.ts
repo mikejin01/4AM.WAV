@@ -16,7 +16,7 @@ export async function POST() {
       const text = await res.text();
       console.error("Deepgram token error:", res.status, text);
       return NextResponse.json(
-        { error: "Failed to generate token" },
+        { error: `Deepgram ${res.status}: ${text}` },
         { status: 502 }
       );
     }
