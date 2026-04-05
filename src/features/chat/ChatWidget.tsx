@@ -2,6 +2,8 @@
 
 import { useEffect, useRef, useState } from "react";
 
+import { useVoiceInput } from "./useVoiceInput";
+
 type Message = {
   id: number;
   role: "user";
@@ -15,6 +17,9 @@ export default function ChatWidget() {
   const bottomRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
   let nextId = useRef(0);
+  const voice = useVoiceInput({
+    onTranscript: (text) => setInput((prev) => (prev ? prev + " " + text : text)),
+  });
 
   useEffect(() => {
     if (open) {
@@ -90,6 +95,9 @@ export default function ChatWidget() {
 
           {/* Input */}
           <div className="border-t border-white/10 px-4 py-3">
+            {voice.error && (
+              <p className="mb-2 text-xs text-red-400">{voice.error}</p>
+            )}
             <form
               onSubmit={(e) => {
                 e.preventDefault();
@@ -102,9 +110,55 @@ export default function ChatWidget() {
                 type="text"
                 value={input}
                 onChange={(e) => setInput(e.target.value)}
-                placeholder="Type a message..."
+                placeholder={
+                  voice.status === "recording"
+                    ? "Listening..."
+                    : voice.status === "transcribing"
+                      ? "Transcribing..."
+                      : "Type a message..."
+                }
                 className="flex-1 rounded-full border border-white/15 bg-white/5 px-4 py-2.5 text-sm text-white placeholder:text-white/30 focus:border-gold focus:outline-none"
               />
+              {/* Mic button */}
+              <button
+                type="button"
+                onClick={
+                  voice.status === "recording"
+                    ? voice.stopRecording
+                    : voice.startRecording
+                }
+                disabled={voice.status === "transcribing"}
+                className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-full border transition-colors disabled:opacity-30 ${
+                  voice.status === "recording"
+                    ? "border-red-500 bg-red-500/20 text-red-400 animate-pulse"
+                    : "border-white/15 bg-white/5 text-white/50 hover:border-white/30 hover:text-white"
+                }`}
+              >
+                {voice.status === "recording" ? (
+                  <svg
+                    className="h-4 w-4"
+                    fill="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <rect x="6" y="6" width="12" height="12" rx="2" />
+                  </svg>
+                ) : (
+                  <svg
+                    className="h-4 w-4"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    strokeWidth={1.5}
+                    stroke="currentColor"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      d="M12 18.75a6 6 0 006-6v-1.5m-6 7.5a6 6 0 01-6-6v-1.5m6 7.5v3.75m-3.75 0h7.5M12 15.75a3 3 0 01-3-3V4.5a3 3 0 116 0v8.25a3 3 0 01-3 3z"
+                    />
+                  </svg>
+                )}
+              </button>
+              {/* Send button */}
               <button
                 type="submit"
                 disabled={!input.trim()}
