@@ -3,13 +3,13 @@ import { serverEnv } from "@/lib/env.server";
 
 export async function POST() {
   try {
-    const res = await fetch("https://api.deepgram.com/v1/auth/token", {
+    const res = await fetch("https://api.deepgram.com/v1/auth/grant", {
       method: "POST",
       headers: {
         Authorization: `Token ${serverEnv.DEEPGRAM_API_KEY}`,
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({ ttl_in_seconds: 30 }),
+      body: JSON.stringify({ ttl_seconds: 30 }),
     });
 
     if (!res.ok) {
