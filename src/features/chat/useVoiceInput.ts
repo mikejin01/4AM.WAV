@@ -33,8 +33,9 @@ export function useVoiceInput(opts: {
     try {
       // Get temp token from our API
       const tokenRes = await fetch("/api/deepgram-token", { method: "POST" });
-      if (!tokenRes.ok) throw new Error("Failed to get token");
-      const { token } = await tokenRes.json();
+      const tokenData = await tokenRes.json();
+      if (!tokenRes.ok) throw new Error(tokenData.error ?? "Failed to get token");
+      const { token } = tokenData;
 
       // Get mic access
       const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
@@ -116,12 +117,14 @@ export function useVoiceInput(opts: {
         cleanup();
         setStatus("idle");
       };
-    } catch (err) {
+    } catch (err: unknown) {
       cleanup();
       if (err instanceof DOMException && err.name === "NotAllowedError") {
         setError("Microphone access denied");
+      } else if (err instanceof Error) {
+        setError(err.message);
       } else {
-        setError("Could not start voice input");
+        setError(String(err));
       }
       setStatus("idle");
     }
