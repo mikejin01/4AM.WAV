@@ -1,6 +1,14 @@
-import { useCallback, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 
 type VoiceStatus = "idle" | "connecting" | "recording" | "error";
+
+type DeepgramResult = {
+  type: string;
+  is_final?: boolean;
+  channel?: {
+    alternatives?: Array<{ transcript?: string }>;
+  };
+};
 
 export function useVoiceInput(opts: {
   onLiveTranscript: (text: string) => void;
@@ -12,6 +20,8 @@ export function useVoiceInput(opts: {
   const socketRef = useRef<WebSocket | null>(null);
   const streamRef = useRef<MediaStream | null>(null);
   const finalizedRef = useRef("");
+  const optsRef = useRef(opts);
+  optsRef.current = opts;
 
   const cleanup = useCallback(() => {
     streamRef.current?.getTracks().forEach((t) => t.stop());
@@ -25,23 +35,25 @@ export function useVoiceInput(opts: {
     recorderRef.current = null;
   }, []);
 
+  useEffect(() => cleanup, [cleanup]);
+
   const startRecording = useCallback(async () => {
     setError(null);
     setStatus("connecting");
     finalizedRef.current = "";
 
     try {
-      // Get temp token from our API
-      const tokenRes = await fetch("/api/deepgram-token", { method: "POST" });
-      const tokenData = await tokenRes.json();
-      if (!tokenRes.ok) throw new Error(tokenData.error ?? "Failed to get token");
-      const { token } = tokenData;
+      const [tokenData, stream] = await Promise.all([
+        fetch("/api/deepgram-token", { method: "POST" }).then(async (res) => {
+          const data = await res.json();
+          if (!res.ok) throw new Error(data.error ?? "Failed to get token");
+          return data as { token: string };
+        }),
+        navigator.mediaDevices.getUserMedia({ audio: true }),
+      ]);
 
-      // Get mic access
-      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
       streamRef.current = stream;
 
-      // Connect to Deepgram WebSocket
       const params = new URLSearchParams({
         model: "nova-3",
         interim_results: "true",
@@ -53,7 +65,7 @@ export function useVoiceInput(opts: {
 
       const ws = new WebSocket(
         `wss://api.deepgram.com/v1/listen?${params.toString()}`,
-        ["token", token]
+        ["token", tokenData.token]
       );
 
       socketRef.current = ws;
@@ -61,7 +73,6 @@ export function useVoiceInput(opts: {
       ws.onopen = () => {
         setStatus("recording");
 
-        // Start MediaRecorder to stream audio chunks
         const mimeType = MediaRecorder.isTypeSupported("audio/webm;codecs=opus")
           ? "audio/webm;codecs=opus"
           : "";
@@ -76,30 +87,27 @@ export function useVoiceInput(opts: {
           }
         };
 
-        recorder.start(250); // Send chunks every 250ms
+        recorder.start(250);
         recorderRef.current = recorder;
       };
 
       ws.onmessage = (event) => {
-        const data = JSON.parse(event.data as string);
+        const data: DeepgramResult = JSON.parse(event.data as string);
         if (data.type !== "Results") return;
 
-        const transcript: string =
-          data.channel?.alternatives?.[0]?.transcript ?? "";
+        const transcript = data.channel?.alternatives?.[0]?.transcript ?? "";
         if (!transcript) return;
 
         if (data.is_final) {
-          // Accumulate finalized segments
           finalizedRef.current = finalizedRef.current
             ? finalizedRef.current + " " + transcript
             : transcript;
-          opts.onLiveTranscript(finalizedRef.current);
+          optsRef.current.onLiveTranscript(finalizedRef.current);
         } else {
-          // Show finalized + current interim
           const live = finalizedRef.current
             ? finalizedRef.current + " " + transcript
             : transcript;
-          opts.onLiveTranscript(live);
+          optsRef.current.onLiveTranscript(live);
         }
       };
 
@@ -110,9 +118,8 @@ export function useVoiceInput(opts: {
       };
 
       ws.onclose = () => {
-        // Deliver final accumulated transcript
         if (finalizedRef.current.trim()) {
-          opts.onFinalTranscript(finalizedRef.current.trim());
+          optsRef.current.onFinalTranscript(finalizedRef.current.trim());
         }
         cleanup();
         setStatus("idle");
@@ -128,19 +135,14 @@ export function useVoiceInput(opts: {
       }
       setStatus("idle");
     }
-  }, [opts, cleanup]);
+  }, [cleanup]);
 
   const stopRecording = useCallback(() => {
-    // Stop MediaRecorder first
     if (recorderRef.current?.state === "recording") {
       recorderRef.current.stop();
     }
 
-    // Stop mic
-    streamRef.current?.getTracks().forEach((t) => t.stop());
-    streamRef.current = null;
-
-    // Tell Deepgram we're done, then close
+    // Signal Deepgram to finalize; ws.onclose handles full cleanup
     if (socketRef.current?.readyState === WebSocket.OPEN) {
       socketRef.current.send(JSON.stringify({ type: "CloseStream" }));
     }

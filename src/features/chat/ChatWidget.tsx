@@ -16,7 +16,7 @@ export default function ChatWidget() {
   const [input, setInput] = useState("");
   const bottomRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
-  let nextId = useRef(0);
+  const nextId = useRef(0);
   const [liveTranscript, setLiveTranscript] = useState("");
   const voice = useVoiceInput({
     onLiveTranscript: (text) => setLiveTranscript(text),
