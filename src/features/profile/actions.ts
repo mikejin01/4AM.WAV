@@ -17,8 +17,11 @@ export async function updatePhone(formData: FormData) {
 
   const { error } = await supabase
     .from("profiles")
-    .update({ phone: phone?.trim() || null, updated_at: new Date().toISOString() })
-    .eq("id", user.id);
+    .upsert({
+      id: user.id,
+      phone: phone?.trim() || null,
+      updated_at: new Date().toISOString(),
+    });
 
   if (error) {
     return { success: false, error: error.message };
