@@ -1,6 +1,6 @@
 import { redirect } from "next/navigation";
-import { createClient } from "@/lib/supabase/server";
-import WelcomeContent from "./WelcomeContent";
+import { createClient } from "@/lib/integrations/supabase/server";
+import WelcomeContent from "@/features/welcome/WelcomeContent";
 
 export default async function WelcomePage() {
   const supabase = await createClient();

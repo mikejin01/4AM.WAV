@@ -1,21 +1,7 @@
-import { createClient } from "@/lib/supabase/server";
-import EventCard from "@/components/EventCard";
-import Navbar from "@/components/Navbar";
-
-type Event = {
-  id: string;
-  title: string;
-  image_url: string | null;
-  venue_name: string;
-  venue_address: string;
-  starts_at: string;
-  ends_at: string;
-  ticket_tiers: {
-    id: string;
-    name: string;
-    price_cents: number;
-  }[];
-};
+import { createClient } from "@/lib/integrations/supabase/server";
+import Navbar from "@/components/layout/Navbar";
+import EventCard from "@/features/events/EventCard";
+import type { EventSummary } from "@/features/events/types";
 
 export default async function EventsPage() {
   const supabase = await createClient();
@@ -35,7 +21,7 @@ export default async function EventsPage() {
     `
     )
     .order("starts_at", { ascending: true })
-    .returns<Event[]>();
+    .returns<EventSummary[]>();
 
   return (
     <>

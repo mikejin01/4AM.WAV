@@ -1,31 +1,8 @@
 import { redirect } from "next/navigation";
-import { createClient } from "@/lib/supabase/server";
-import Navbar from "@/components/Navbar";
-import OrderCard from "@/components/OrderCard";
-
-type OrderItem = {
-  id: string;
-  quantity: number;
-  unit_price_cents: number;
-  ticket_tiers: {
-    name: string;
-  };
-};
-
-type Order = {
-  id: string;
-  status: string;
-  total_cents: number;
-  created_at: string;
-  events: {
-    id: string;
-    title: string;
-    image_url: string | null;
-    venue_name: string;
-    starts_at: string;
-  };
-  order_items: OrderItem[];
-};
+import { createClient } from "@/lib/integrations/supabase/server";
+import Navbar from "@/components/layout/Navbar";
+import OrderCard from "@/features/tickets/OrderCard";
+import type { Order } from "@/features/tickets/types";
 
 export default async function TicketsPage() {
   const supabase = await createClient();

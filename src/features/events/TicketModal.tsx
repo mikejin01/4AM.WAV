@@ -2,24 +2,9 @@
 
 import { useEffect, useState } from "react";
 import Image from "next/image";
-import { createClient } from "@/lib/supabase/client";
+import { createClient } from "@/lib/integrations/supabase/client";
 
-type TicketTier = {
-  id: string;
-  name: string;
-  price_cents: number;
-  quantity: number;
-  sold_count: number;
-};
-
-type Event = {
-  id: string;
-  title: string;
-  image_url: string | null;
-  venue_name: string;
-  starts_at: string;
-  ticket_tiers: TicketTier[];
-};
+import type { EventDetail } from "./types";
 
 type Selection = Record<string, number>;
 
@@ -42,7 +27,7 @@ function formatShortDate(startsAt: string) {
   });
 }
 
-function EventSidebar({ event }: { event: Event }) {
+function EventSidebar({ event }: { event: EventDetail }) {
   return (
     <div className="flex flex-col items-center gap-4 text-center">
       <h2 className="text-lg font-bold text-white">{event.title}</h2>
@@ -71,7 +56,7 @@ function SelectStep({
   setSelection,
   onNext,
 }: {
-  event: Event;
+  event: EventDetail;
   selection: Selection;
   setSelection: (s: Selection) => void;
   onNext: () => void;
@@ -162,7 +147,7 @@ function SummaryStep({
   onConfirm,
   loading,
 }: {
-  event: Event;
+  event: EventDetail;
   selection: Selection;
   onBack: () => void;
   onConfirm: () => void;
@@ -245,7 +230,7 @@ function ConfirmedStep({
   selection,
   onClose,
 }: {
-  event: Event;
+  event: EventDetail;
   selection: Selection;
   onClose: () => void;
 }) {
@@ -313,7 +298,7 @@ export default function TicketModal({
   open,
   onClose,
 }: {
-  event: Event;
+  event: EventDetail;
   open: boolean;
   onClose: () => void;
 }) {

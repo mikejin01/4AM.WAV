@@ -4,28 +4,10 @@ import { useEffect, useRef, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { createClient } from "@/lib/supabase/client";
+import { createClient } from "@/lib/integrations/supabase/client";
+
+import type { EventDetail as EventDetailType } from "./types";
 import TicketModal from "./TicketModal";
-
-type TicketTier = {
-  id: string;
-  name: string;
-  price_cents: number;
-  quantity: number;
-  sold_count: number;
-};
-
-type Event = {
-  id: string;
-  title: string;
-  description: string | null;
-  image_url: string | null;
-  venue_name: string;
-  venue_address: string;
-  starts_at: string;
-  ends_at: string;
-  ticket_tiers: TicketTier[];
-};
 
 function formatDate(startsAt: string) {
   const start = new Date(startsAt);
@@ -91,7 +73,7 @@ function extractDominantColor(
   ];
 }
 
-export default function EventDetail({ event }: { event: Event }) {
+export default function EventDetail({ event }: { event: EventDetailType }) {
   const [bgColor, setBgColor] = useState("rgb(10, 5, 20)");
   const [modalOpen, setModalOpen] = useState(false);
   const imgRef = useRef<HTMLImageElement>(null);

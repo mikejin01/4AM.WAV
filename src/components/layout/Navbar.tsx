@@ -4,7 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import type { User } from "@supabase/supabase-js";
-import { createClient } from "@/lib/supabase/client";
+import { createClient } from "@/lib/integrations/supabase/client";
 
 function UserMenu({
   user,
@@ -55,7 +55,7 @@ function UserMenu({
       {open && (
         <div className="absolute right-0 top-full mt-2 w-44 overflow-hidden rounded-lg border border-white/10 bg-surface-light shadow-xl">
           <Link
-            href="#"
+            href="/profile"
             onClick={() => setOpen(false)}
             className="block px-4 py-2.5 text-sm text-white/70 transition-colors hover:bg-white/5 hover:text-white"
           >
@@ -233,7 +233,7 @@ export default function Navbar() {
               </li>
               <li>
                 <Link
-                  href="#"
+                  href="/profile"
                   onClick={() => setMenuOpen(false)}
                   className="text-2xl font-medium uppercase tracking-widest text-white transition-colors hover:text-gold"
                 >

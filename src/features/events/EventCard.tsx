@@ -1,24 +1,7 @@
 import Image from "next/image";
 import Link from "next/link";
 
-type TicketTier = {
-  id: string;
-  name: string;
-  price_cents: number;
-};
-
-type EventCardProps = {
-  event: {
-    id: string;
-    title: string;
-    image_url: string | null;
-    venue_name: string;
-    venue_address: string;
-    starts_at: string;
-    ends_at: string;
-    ticket_tiers: TicketTier[];
-  };
-};
+import type { EventSummary } from "./types";
 
 function formatEventDate(startsAt: string, endsAt: string) {
   const start = new Date(startsAt);
@@ -43,7 +26,7 @@ function formatEventDate(startsAt: string, endsAt: string) {
   return `${day} ${startTime}-${endTime}`;
 }
 
-function formatPrice(tiers: TicketTier[]) {
+function formatPrice(tiers: EventSummary["ticket_tiers"]) {
   if (!tiers.length) return "TBA";
 
   const lowestPrice = Math.min(...tiers.map((t) => t.price_cents));
@@ -57,7 +40,7 @@ function formatPrice(tiers: TicketTier[]) {
   return tiers.length > 1 ? `From ${formatted}` : formatted;
 }
 
-export default function EventCard({ event }: EventCardProps) {
+export default function EventCard({ event }: { event: EventSummary }) {
   return (
     <Link href={`/events/${event.id}`} className="group block">
       <div className="overflow-hidden rounded-lg">

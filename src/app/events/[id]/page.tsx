@@ -1,27 +1,8 @@
 import { notFound } from "next/navigation";
-import { createClient } from "@/lib/supabase/server";
-import Navbar from "@/components/Navbar";
-import EventDetail from "@/components/EventDetail";
-
-type TicketTier = {
-  id: string;
-  name: string;
-  price_cents: number;
-  quantity: number;
-  sold_count: number;
-};
-
-type Event = {
-  id: string;
-  title: string;
-  description: string | null;
-  image_url: string | null;
-  venue_name: string;
-  venue_address: string;
-  starts_at: string;
-  ends_at: string;
-  ticket_tiers: TicketTier[];
-};
+import { createClient } from "@/lib/integrations/supabase/server";
+import Navbar from "@/components/layout/Navbar";
+import EventDetail from "@/features/events/EventDetail";
+import type { EventDetail as EventDetailType } from "@/features/events/types";
 
 export default async function EventDetailPage({
   params,
@@ -47,7 +28,7 @@ export default async function EventDetailPage({
     `
     )
     .eq("id", id)
-    .single<Event>();
+    .single<EventDetailType>();
 
   if (!event) {
     notFound();

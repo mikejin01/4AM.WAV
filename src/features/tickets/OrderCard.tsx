@@ -1,29 +1,7 @@
 import Image from "next/image";
 import Link from "next/link";
 
-type OrderItem = {
-  id: string;
-  quantity: number;
-  unit_price_cents: number;
-  ticket_tiers: {
-    name: string;
-  };
-};
-
-type Order = {
-  id: string;
-  status: string;
-  total_cents: number;
-  created_at: string;
-  events: {
-    id: string;
-    title: string;
-    image_url: string | null;
-    venue_name: string;
-    starts_at: string;
-  };
-  order_items: OrderItem[];
-};
+import type { Order, OrderItem } from "./types";
 
 function formatPrice(cents: number) {
   if (cents === 0) return "$0.00";
