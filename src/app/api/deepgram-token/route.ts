@@ -1,23 +1,30 @@
 import { NextResponse } from "next/server";
-import { deepgram } from "@/lib/integrations/deepgram/server";
+import { serverEnv } from "@/lib/env.server";
 
 export async function POST() {
   try {
-    const response = await deepgram.auth.v1.tokens.grant({
-      ttl_seconds: 30,
+    const res = await fetch("https://api.deepgram.com/v1/auth/token", {
+      method: "POST",
+      headers: {
+        Authorization: `Token ${serverEnv.DEEPGRAM_API_KEY}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ ttl_in_seconds: 30 }),
     });
 
-    if (!response.access_token) {
-      console.error("Deepgram token response missing access_token:", response);
+    if (!res.ok) {
+      const text = await res.text();
+      console.error("Deepgram token error:", res.status, text);
       return NextResponse.json(
-        { error: "No token returned from Deepgram" },
+        { error: "Failed to generate token" },
         { status: 502 }
       );
     }
 
+    const data = await res.json();
+
     return NextResponse.json({
-      token: response.access_token,
-      expiresIn: response.expires_in,
+      token: data.access_token ?? data.token,
     });
   } catch (err) {
     console.error("Deepgram token error:", err);
