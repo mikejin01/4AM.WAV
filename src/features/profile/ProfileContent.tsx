@@ -2,7 +2,6 @@
 
 import { useRef, useState } from "react";
 import Image from "next/image";
-import Link from "next/link";
 
 import type { MembershipTier } from "./types";
 import { updatePhone } from "./actions";
@@ -29,6 +28,7 @@ export default function ProfileContent({
     type: "success" | "error";
     text: string;
   } | null>(null);
+  const [upgrading, setUpgrading] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
 
   async function handleSave() {
@@ -169,12 +169,29 @@ export default function ProfileContent({
                 </span>
               </div>
               {membershipTier === "free" && (
-                <Link
-                  href="/checkout"
-                  className="rounded-lg bg-gold px-4 py-2 text-sm font-bold uppercase tracking-wider text-black transition-colors hover:bg-gold-light"
+                <button
+                  onClick={async () => {
+                    setUpgrading(true);
+                    setMessage(null);
+                    try {
+                      const res = await fetch("/api/checkout", { method: "POST" });
+                      const data = await res.json();
+                      if (data.url) {
+                        window.location.href = data.url;
+                      } else {
+                        setMessage({ type: "error", text: data.error ?? "Failed to start checkout" });
+                        setUpgrading(false);
+                      }
+                    } catch {
+                      setMessage({ type: "error", text: "Something went wrong" });
+                      setUpgrading(false);
+                    }
+                  }}
+                  disabled={upgrading}
+                  className="rounded-lg bg-gold px-4 py-2 text-sm font-bold uppercase tracking-wider text-black transition-colors hover:bg-gold-light disabled:opacity-50"
                 >
-                  Upgrade to VIP
-                </Link>
+                  {upgrading ? "Redirecting..." : "Upgrade to VIP"}
+                </button>
               )}
             </div>
           </div>
