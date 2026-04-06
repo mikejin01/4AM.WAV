@@ -38,12 +38,14 @@ function GalleryCard({
   label,
   image,
   className,
+  sizes,
   visible,
   delay,
 }: {
   label: string;
   image: string;
   className: string;
+  sizes: string;
   visible: boolean;
   delay: number;
 }) {
@@ -61,7 +63,7 @@ function GalleryCard({
         alt={label}
         fill
         className="object-cover transition-transform duration-500 group-hover:scale-105"
-        sizes="(max-width: 640px) 100vw, 50vw"
+        sizes={sizes}
       />
       {/* Dark overlay gradient for legibility */}
       <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/10 to-transparent" />
@@ -129,12 +131,14 @@ export default function CommunitySection() {
           <GalleryCard
             {...GALLERY_ITEMS[0]}
             className="col-span-2 aspect-[16/9] sm:col-span-7 sm:row-start-1 sm:aspect-auto"
+            sizes="(max-width: 640px) 100vw, 58vw"
             visible={visible}
             delay={0}
           />
           <GalleryCard
             {...GALLERY_ITEMS[1]}
             className="col-span-2 aspect-[16/9] sm:col-span-5 sm:row-start-1 sm:aspect-auto"
+            sizes="(max-width: 640px) 100vw, 42vw"
             visible={visible}
             delay={80}
           />
@@ -143,18 +147,21 @@ export default function CommunitySection() {
           <GalleryCard
             {...GALLERY_ITEMS[2]}
             className="col-span-1 aspect-square sm:col-span-4 sm:row-start-2 sm:aspect-auto"
+            sizes="(max-width: 640px) 50vw, 33vw"
             visible={visible}
             delay={160}
           />
           <GalleryCard
             {...GALLERY_ITEMS[3]}
             className="col-span-1 aspect-square sm:col-span-4 sm:row-start-2 sm:aspect-auto"
+            sizes="(max-width: 640px) 50vw, 33vw"
             visible={visible}
             delay={240}
           />
           <GalleryCard
             {...GALLERY_ITEMS[4]}
             className="col-span-2 aspect-[16/9] sm:col-span-4 sm:row-start-2 sm:aspect-auto"
+            sizes="(max-width: 640px) 100vw, 33vw"
             visible={visible}
             delay={320}
           />
@@ -163,12 +170,14 @@ export default function CommunitySection() {
           <GalleryCard
             {...GALLERY_ITEMS[5]}
             className="col-span-2 aspect-[16/9] sm:col-span-5 sm:row-start-3 sm:aspect-auto"
+            sizes="(max-width: 640px) 100vw, 42vw"
             visible={visible}
             delay={400}
           />
           <GalleryCard
             {...GALLERY_ITEMS[6]}
             className="col-span-2 aspect-[16/9] sm:col-span-7 sm:row-start-3 sm:aspect-auto"
+            sizes="(max-width: 640px) 100vw, 58vw"
             visible={visible}
             delay={480}
           />

@@ -2,10 +2,6 @@
 
 import { useEffect, useRef } from "react";
 import Link from "next/link";
-import { gsap } from "gsap";
-import { ScrollTrigger } from "gsap/ScrollTrigger";
-
-gsap.registerPlugin(ScrollTrigger);
 
 const HERO_WORDS = ["WHERE", "THE", "NIGHT", "LIVES."];
 
@@ -13,28 +9,34 @@ export default function HeroSection({ animate }: { animate: boolean }) {
   const sectionRef = useRef<HTMLElement>(null);
   const contentRef = useRef<HTMLDivElement>(null);
 
-  // Scroll parallax (only needs GSAP for scroll-linked behavior)
+  // Lazy-load GSAP only for scroll parallax
   useEffect(() => {
     const section = sectionRef.current;
     const content = contentRef.current;
     if (!section || !content) return;
 
-    let ctx: gsap.Context | undefined;
+    let ctx: { revert: () => void } | undefined;
+    let raf: number;
 
-    const raf = requestAnimationFrame(() => {
-      ctx = gsap.context(() => {
-        gsap.to(content, {
-          y: -80,
-          opacity: 0.3,
-          scrollTrigger: {
-            trigger: section,
-            start: "top top",
-            end: "bottom top",
-            scrub: true,
-          },
+    import("gsap").then(({ gsap }) =>
+      import("gsap/ScrollTrigger").then(({ ScrollTrigger }) => {
+        gsap.registerPlugin(ScrollTrigger);
+        raf = requestAnimationFrame(() => {
+          ctx = gsap.context(() => {
+            gsap.to(content, {
+              y: -80,
+              opacity: 0.3,
+              scrollTrigger: {
+                trigger: section,
+                start: "top top",
+                end: "bottom top",
+                scrub: true,
+              },
+            });
+          }, section);
         });
-      }, section);
-    });
+      }),
+    );
 
     return () => {
       cancelAnimationFrame(raf);
@@ -54,8 +56,10 @@ export default function HeroSection({ animate }: { animate: boolean }) {
           muted
           loop
           playsInline
+          preload="auto"
           className="h-full w-full object-cover"
           src="/assets/home/hero-video.MP4"
+          poster="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg'/%3E"
         />
         {/* Dark overlays for text legibility */}
         <div className="absolute inset-0 bg-black/55" />

@@ -39,27 +39,30 @@ export default function TestimonialSection() {
   }, []);
 
   useEffect(() => {
-    const interval = setInterval(next, 5000);
-    return () => clearInterval(interval);
-  }, [next]);
-
-  useEffect(() => {
     const section = sectionRef.current;
     if (!section) return;
+
+    let interval: ReturnType<typeof setInterval> | undefined;
 
     const observer = new IntersectionObserver(
       ([entry]) => {
         if (entry.isIntersecting) {
           setVisible(true);
-          observer.disconnect();
+          if (!interval) interval = setInterval(next, 5000);
+        } else if (interval) {
+          clearInterval(interval);
+          interval = undefined;
         }
       },
       { threshold: 0.2 },
     );
 
     observer.observe(section);
-    return () => observer.disconnect();
-  }, []);
+    return () => {
+      observer.disconnect();
+      if (interval) clearInterval(interval);
+    };
+  }, [next]);
 
   const testimonial = TESTIMONIALS[active];
 

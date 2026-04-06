@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useCallback } from "react";
+import { useState } from "react";
 
 import LoadingScreen from "./components/LoadingScreen";
 import HeroSection from "./components/HeroSection";
@@ -12,13 +12,9 @@ import CTAFooter from "./components/CTAFooter";
 export default function HomePage() {
   const [loaded, setLoaded] = useState(false);
 
-  const handleLoadingComplete = useCallback(() => {
-    setLoaded(true);
-  }, []);
-
   return (
     <>
-      {!loaded && <LoadingScreen onComplete={handleLoadingComplete} />}
+      {!loaded && <LoadingScreen onComplete={() => setLoaded(true)} />}
       <main>
         <HeroSection animate={loaded} />
         <CollaboratorsSection />
