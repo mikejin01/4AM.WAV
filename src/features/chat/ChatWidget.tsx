@@ -1,10 +1,11 @@
 "use client";
 
+import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 
 type Message = {
   id: number;
-  role: "user";
+  role: "user" | "bot";
   text: string;
 };
 
@@ -12,9 +13,11 @@ export default function ChatWidget() {
   const [open, setOpen] = useState(false);
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState("");
+  const [awaitingPassword, setAwaitingPassword] = useState(false);
   const bottomRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
   const nextId = useRef(0);
+  const router = useRouter();
 
   useEffect(() => {
     if (open) {
@@ -26,6 +29,15 @@ export default function ChatWidget() {
     bottomRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages]);
 
+  function addBotMessage(text: string) {
+    setTimeout(() => {
+      setMessages((prev) => [
+        ...prev,
+        { id: nextId.current++, role: "bot", text },
+      ]);
+    }, 600);
+  }
+
   function handleSend() {
     const text = input.trim();
     if (!text) return;
@@ -35,6 +47,25 @@ export default function ChatWidget() {
       { id: nextId.current++, role: "user", text },
     ]);
     setInput("");
+
+    const lower = text.toLowerCase();
+
+    if (awaitingPassword) {
+      if (text === "888") {
+        addBotMessage("Access granted. Redirecting...");
+        setTimeout(() => router.push("/live-support"), 1200);
+      } else {
+        addBotMessage("Incorrect password. Try again.");
+      }
+      setAwaitingPassword(false);
+      return;
+    }
+
+    if (lower === "live support") {
+      addBotMessage("What is the password?");
+      setAwaitingPassword(true);
+      return;
+    }
   }
 
   return (
@@ -74,8 +105,17 @@ export default function ChatWidget() {
             ) : (
               <div className="space-y-3">
                 {messages.map((msg) => (
-                  <div key={msg.id} className="flex justify-end">
-                    <div className="max-w-[80%] rounded-2xl rounded-br-md bg-gold px-4 py-2.5 text-sm text-black">
+                  <div
+                    key={msg.id}
+                    className={`flex ${msg.role === "user" ? "justify-end" : "justify-start"}`}
+                  >
+                    <div
+                      className={`max-w-[80%] rounded-2xl px-4 py-2.5 text-sm ${
+                        msg.role === "user"
+                          ? "rounded-br-md bg-gold text-black"
+                          : "rounded-bl-md border border-white/10 bg-white/5 text-white/80"
+                      }`}
+                    >
                       {msg.text}
                     </div>
                   </div>
