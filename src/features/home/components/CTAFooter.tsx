@@ -1,29 +1,11 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 
+import { useScrollReveal } from "../hooks/useScrollReveal";
+
 export default function CTAFooter() {
-  const ctaRef = useRef<HTMLElement>(null);
-  const [visible, setVisible] = useState(false);
-
-  useEffect(() => {
-    const cta = ctaRef.current;
-    if (!cta) return;
-
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        if (entry.isIntersecting) {
-          setVisible(true);
-          observer.disconnect();
-        }
-      },
-      { threshold: 0.2 },
-    );
-
-    observer.observe(cta);
-    return () => observer.disconnect();
-  }, []);
+  const { ref: ctaRef, visible } = useScrollReveal();
 
   return (
     <>

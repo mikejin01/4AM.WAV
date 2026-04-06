@@ -1,7 +1,8 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
 import Image from "next/image";
+
+import { useScrollReveal } from "../hooks/useScrollReveal";
 
 const GALLERY_ITEMS = [
   {
@@ -77,29 +78,10 @@ function GalleryCard({
 }
 
 export default function CommunitySection() {
-  const sectionRef = useRef<HTMLElement>(null);
-  const [visible, setVisible] = useState(false);
-
-  useEffect(() => {
-    const section = sectionRef.current;
-    if (!section) return;
-
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        if (entry.isIntersecting) {
-          setVisible(true);
-          observer.disconnect();
-        }
-      },
-      { threshold: 0.15 },
-    );
-
-    observer.observe(section);
-    return () => observer.disconnect();
-  }, []);
+  const { ref, visible } = useScrollReveal(0.15);
 
   return (
-    <section ref={sectionRef} className="px-6 py-24 sm:py-32">
+    <section ref={ref} className="px-6 py-24 sm:py-32">
       <div className="mx-auto max-w-6xl">
         {/* Header */}
         <div
