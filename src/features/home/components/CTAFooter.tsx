@@ -9,7 +9,6 @@ export default function CTAFooter() {
 
   return (
     <>
-      {/* CTA Section */}
       <section
         ref={ctaRef}
         className="relative overflow-hidden px-6 py-32 sm:py-40"
@@ -60,7 +59,6 @@ export default function CTAFooter() {
         </div>
       </section>
 
-      {/* Footer */}
       <footer className="border-t border-white/[0.06] px-6 py-12 sm:py-16">
         <div className="mx-auto flex max-w-6xl flex-col items-center gap-10 sm:flex-row sm:items-start sm:justify-between">
           <div className="text-center sm:text-left">

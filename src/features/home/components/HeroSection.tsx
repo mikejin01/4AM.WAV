@@ -49,7 +49,6 @@ export default function HeroSection({ animate }: { animate: boolean }) {
       ref={sectionRef}
       className="relative flex min-h-screen flex-col items-center justify-center overflow-hidden px-6"
     >
-      {/* Background video */}
       <div className="absolute inset-0">
         <video
           autoPlay
@@ -61,17 +60,14 @@ export default function HeroSection({ animate }: { animate: boolean }) {
           src="/assets/home/hero-video.MP4"
           poster="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg'/%3E"
         />
-        {/* Dark overlays for text legibility */}
+        {/* Overlays for text legibility over video */}
         <div className="absolute inset-0 bg-black/55" />
         <div className="absolute inset-0 bg-gradient-to-t from-black via-black/20 to-black/40" />
       </div>
 
-      {/* Ambient gold glow */}
       <div className="pointer-events-none absolute inset-0">
         <div className="absolute left-1/2 top-1/3 h-[700px] w-[700px] -translate-x-1/2 -translate-y-1/2 rounded-full bg-gold/[0.04] blur-[160px]" />
       </div>
-
-      {/* Content */}
       <div
         ref={contentRef}
         className="relative z-10 flex flex-col items-center text-center"

@@ -66,7 +66,6 @@ function GalleryCard({
         className="object-cover transition-transform duration-500 group-hover:scale-105"
         sizes={sizes}
       />
-      {/* Dark overlay gradient for legibility */}
       <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/10 to-transparent" />
       <div className="relative flex h-full items-end p-4 sm:p-6">
         <p className="text-[10px] font-medium uppercase tracking-widest text-white/50 sm:text-xs">
