@@ -2,8 +2,6 @@
 
 import { useEffect, useRef, useState } from "react";
 
-import { useVoiceInput } from "./useVoiceInput";
-
 type Message = {
   id: number;
   role: "user";
@@ -17,14 +15,6 @@ export default function ChatWidget() {
   const bottomRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
   const nextId = useRef(0);
-  const [liveTranscript, setLiveTranscript] = useState("");
-  const voice = useVoiceInput({
-    onLiveTranscript: (text) => setLiveTranscript(text),
-    onFinalTranscript: (text) => {
-      setInput((prev) => (prev ? prev + " " + text : text));
-      setLiveTranscript("");
-    },
-  });
 
   useEffect(() => {
     if (open) {
@@ -49,10 +39,8 @@ export default function ChatWidget() {
 
   return (
     <>
-      {/* Chat window */}
       {open && (
         <div className="fixed bottom-24 right-6 z-50 flex h-[480px] w-[360px] flex-col overflow-hidden rounded-2xl border border-white/10 bg-[#0d0d12] shadow-2xl sm:right-10">
-          {/* Header */}
           <div className="flex items-center justify-between border-b border-white/10 px-5 py-4">
             <div>
               <p className="text-sm font-semibold text-white">4AM.WAV</p>
@@ -78,7 +66,6 @@ export default function ChatWidget() {
             </button>
           </div>
 
-          {/* Messages */}
           <div className="flex-1 overflow-y-auto px-5 py-4">
             {messages.length === 0 ? (
               <p className="text-center text-sm text-white/30">
@@ -98,23 +85,7 @@ export default function ChatWidget() {
             <div ref={bottomRef} />
           </div>
 
-          {/* Input */}
           <div className="border-t border-white/10 px-4 py-3">
-            {voice.error && (
-              <p className="mb-2 text-xs text-red-400">{voice.error}</p>
-            )}
-            {(voice.status === "recording" || voice.status === "connecting") && (
-              <div className="mb-2 rounded-lg bg-white/5 px-3 py-2">
-                <div className="flex items-center gap-2">
-                  <span className="h-2 w-2 shrink-0 animate-pulse rounded-full bg-red-500" />
-                  <p className="text-xs text-white/60">
-                    {voice.status === "connecting"
-                      ? "Connecting..."
-                      : liveTranscript || "Listening..."}
-                  </p>
-                </div>
-              </div>
-            )}
             <form
               onSubmit={(e) => {
                 e.preventDefault();
@@ -127,55 +98,9 @@ export default function ChatWidget() {
                 type="text"
                 value={input}
                 onChange={(e) => setInput(e.target.value)}
-                placeholder={
-                  voice.status === "recording"
-                    ? "Listening..."
-                    : voice.status === "connecting"
-                      ? "Connecting..."
-                      : "Type a message..."
-                }
+                placeholder="Type a message..."
                 className="flex-1 rounded-full border border-white/15 bg-white/5 px-4 py-2.5 text-sm text-white placeholder:text-white/30 focus:border-gold focus:outline-none"
               />
-              {/* Mic button */}
-              <button
-                type="button"
-                onClick={
-                  voice.status === "recording"
-                    ? voice.stopRecording
-                    : voice.startRecording
-                }
-                disabled={voice.status === "connecting"}
-                className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-full border transition-colors disabled:opacity-30 ${
-                  voice.status === "recording"
-                    ? "border-red-500 bg-red-500/20 text-red-400 animate-pulse"
-                    : "border-white/15 bg-white/5 text-white/50 hover:border-white/30 hover:text-white"
-                }`}
-              >
-                {voice.status === "recording" ? (
-                  <svg
-                    className="h-4 w-4"
-                    fill="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    <rect x="6" y="6" width="12" height="12" rx="2" />
-                  </svg>
-                ) : (
-                  <svg
-                    className="h-4 w-4"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    strokeWidth={1.5}
-                    stroke="currentColor"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      d="M12 18.75a6 6 0 006-6v-1.5m-6 7.5a6 6 0 01-6-6v-1.5m6 7.5v3.75m-3.75 0h7.5M12 15.75a3 3 0 01-3-3V4.5a3 3 0 116 0v8.25a3 3 0 01-3 3z"
-                    />
-                  </svg>
-                )}
-              </button>
-              {/* Send button */}
               <button
                 type="submit"
                 disabled={!input.trim()}
@@ -200,7 +125,6 @@ export default function ChatWidget() {
         </div>
       )}
 
-      {/* Floating button */}
       <button
         onClick={() => setOpen(!open)}
         className="fixed bottom-6 right-6 z-50 flex h-14 w-14 items-center justify-center rounded-full bg-gold shadow-lg transition-transform hover:scale-105 hover:bg-gold-light sm:right-10"

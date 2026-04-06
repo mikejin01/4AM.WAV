@@ -1,11 +1,11 @@
 import Navbar from "@/components/layout/Navbar";
-import HeroSection from "@/features/home/HeroSection";
+import HomePage from "@/features/home/HomePage";
 
 export default function Home() {
   return (
     <>
       <Navbar />
-      <HeroSection />
+      <HomePage />
     </>
   );
 }

@@ -10,6 +10,7 @@
   --color-surface-light: #141414;
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
+  --font-heading: var(--font-bricolage);
 }
 
 body {
@@ -37,4 +38,242 @@ body {
   background-repeat: repeat;
   background-size: 256px 256px;
   z-index: 50;
+}
+
+/* Landing page: override dark body styles */
+.landing-page {
+  color: #0a0a0a;
+}
+
+/* Marquee animation */
+@keyframes marquee-scroll {
+  0% {
+    transform: translateX(0);
+  }
+  100% {
+    transform: translateX(-50%);
+  }
+}
+
+.landing-marquee {
+  animation: marquee-scroll 30s linear infinite;
+  width: max-content;
+}
+
+.landing-marquee:hover {
+  animation-play-state: paused;
+}
+
+.landing-marquee-slow {
+  animation: marquee-scroll 40s linear infinite;
+  width: max-content;
+}
+
+.landing-marquee-slow:hover {
+  animation-play-state: paused;
+}
+
+/* Hero fade-in for event details */
+@keyframes fade-in {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-fade-in {
+  animation: fade-in 0.3s ease-out;
+}
+
+/* Hide scrollbar but allow scrolling */
+.scrollbar-hide {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
+}
+
+/* Home page marquee */
+.home-marquee {
+  animation: marquee-scroll 35s linear infinite;
+  width: max-content;
+}
+
+.home-marquee-reverse {
+  animation-direction: reverse;
+}
+
+/* Home page testimonial fade */
+@keyframes home-fade-in {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.home-fade-in {
+  animation: home-fade-in 0.4s ease-out;
+}
+
+/* ── Loading screen ── */
+
+/* Character reveal: blur-in one by one */
+@keyframes char-reveal {
+  0% {
+    opacity: 0;
+    filter: blur(12px);
+    transform: translateY(20px) scale(0.9);
+  }
+  100% {
+    opacity: 1;
+    filter: blur(0);
+    transform: translateY(0) scale(1);
+  }
+}
+
+/* Subtitle + lines fade in */
+@keyframes subtitle-in {
+  0% {
+    opacity: 0;
+    letter-spacing: 1em;
+  }
+  100% {
+    opacity: 1;
+    letter-spacing: 0.5em;
+  }
+}
+
+@keyframes line-expand {
+  0% {
+    transform: scaleX(0);
+    opacity: 0;
+  }
+  100% {
+    transform: scaleX(1);
+    opacity: 1;
+  }
+}
+
+/* Audio waveform bars */
+@keyframes wave-bar {
+  0%,
+  100% {
+    height: 4px;
+    opacity: 0.15;
+  }
+  50% {
+    height: 20px;
+    opacity: 0.5;
+  }
+}
+
+/* Gold glow pulse */
+@keyframes glow-pulse {
+  0% {
+    opacity: 0;
+    transform: translate(-50%, -50%) scale(0.5);
+  }
+  50% {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1);
+  }
+  100% {
+    opacity: 0.4;
+    transform: translate(-50%, -50%) scale(1.3);
+  }
+}
+
+/* Exit: clip-path aperture close */
+@keyframes loading-aperture-exit {
+  0% {
+    clip-path: inset(0 0 0 0);
+    opacity: 1;
+  }
+  70% {
+    clip-path: inset(0 0 0 0);
+    opacity: 1;
+  }
+  100% {
+    clip-path: inset(50% 50% 50% 50%);
+    opacity: 0;
+  }
+}
+
+.loading-char {
+  opacity: 0;
+  animation: char-reveal 0.6s cubic-bezier(0.16, 1, 0.3, 1)
+    calc(0.15s + var(--char-index) * 0.12s) forwards;
+}
+
+.loading-subtitle {
+  opacity: 0;
+  animation: subtitle-in 0.5s cubic-bezier(0.16, 1, 0.3, 1) 0.7s forwards;
+}
+
+.loading-line {
+  transform: scaleX(0);
+  animation: line-expand 0.5s cubic-bezier(0.16, 1, 0.3, 1) 0.8s forwards;
+}
+
+.loading-glow {
+  opacity: 0;
+  animation: glow-pulse 1.8s ease-in-out 0.3s forwards;
+}
+
+.loading-wave {
+  opacity: 0;
+  animation: hero-fade-up 0.5s ease-out 0.9s forwards;
+}
+
+.loading-wave-bar {
+  height: 4px;
+  animation: wave-bar 0.8s ease-in-out calc(1s + var(--wave-index) * 0.04s)
+    infinite alternate;
+}
+
+.loading-screen {
+  animation: loading-aperture-exit 0.8s cubic-bezier(0.76, 0, 0.24, 1) 1.8s
+    forwards;
+}
+
+/* ── Hero reveal (CSS fallback for GSAP) ── */
+@keyframes hero-word-in {
+  from {
+    opacity: 0;
+    transform: translateY(50px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes hero-line-in {
+  from {
+    transform: scaleX(0);
+  }
+  to {
+    transform: scaleX(1);
+  }
+}
+
+@keyframes hero-fade-up {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
