@@ -26,6 +26,7 @@ export default function LiveSupportPage() {
   const [elapsed, setElapsed] = useState(0);
   const [error, setError] = useState<string | null>(null);
   const transcriptEndRef = useRef<HTMLDivElement>(null);
+  const videoRef = useRef<HTMLVideoElement>(null);
   const nextId = useRef(0);
   const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const socketRef = useRef<WebSocket | null>(null);
@@ -68,6 +69,9 @@ export default function LiveSupportPage() {
   function cleanup() {
     streamRef.current?.getTracks().forEach((t) => t.stop());
     streamRef.current = null;
+    if (videoRef.current) {
+      videoRef.current.srcObject = null;
+    }
     if (socketRef.current) {
       socketRef.current.close();
       socketRef.current = null;
@@ -99,6 +103,11 @@ export default function LiveSupportPage() {
       }
 
       streamRef.current = stream;
+
+      // Show screen capture in video element
+      if (videoRef.current) {
+        videoRef.current.srcObject = stream;
+      }
 
       // Listen for user stopping screen share via browser UI
       stream.getVideoTracks()[0].addEventListener("ended", () => {
@@ -402,8 +411,9 @@ export default function LiveSupportPage() {
           </div>
         </div>
 
-        {/* Right panel — Screen / Info */}
-        <div className="hidden w-[420px] flex-col lg:flex">
+        {/* Right panel — Screen capture + Info */}
+        <div className="hidden w-[480px] flex-col lg:flex">
+          {/* Top: Screen capture header */}
           <div className="flex items-center gap-3 border-b border-white/[0.06] px-6 py-3">
             <div className="flex h-6 w-6 items-center justify-center rounded bg-white/[0.06]">
               <svg
@@ -421,63 +431,27 @@ export default function LiveSupportPage() {
               </svg>
             </div>
             <h2 className="text-sm font-medium tracking-wide text-white/50">
-              SESSION INFO
+              SCREEN
             </h2>
+            {status === "active" && (
+              <span className="ml-auto flex items-center gap-1.5 text-xs text-emerald-400/80">
+                <span className="live-pulse inline-block h-1.5 w-1.5 rounded-full bg-emerald-400" />
+                Live
+              </span>
+            )}
           </div>
 
-          <div className="flex flex-1 flex-col items-center justify-center gap-6 px-8">
-            {status === "active" ? (
-              <>
-                {/* Waveform visualization */}
-                <div className="flex h-24 items-end justify-center gap-[3px]">
-                  {Array.from({ length: 32 }).map((_, i) => (
-                    <div
-                      key={i}
-                      className="session-wave-bar w-[3px] rounded-full bg-gold/40"
-                      style={
-                        {
-                          "--wave-index": i,
-                        } as React.CSSProperties
-                      }
-                    />
-                  ))}
-                </div>
-
-                <div className="text-center">
-                  <p className="font-mono text-3xl font-light tracking-widest text-white/70">
-                    {formatElapsed(elapsed)}
-                  </p>
-                  <p className="mt-2 text-xs uppercase tracking-widest text-gold/50">
-                    Session Active
-                  </p>
-                </div>
-
-                <div className="mt-4 w-full space-y-3 rounded-xl border border-white/[0.06] bg-white/[0.02] p-5">
-                  <div className="flex items-center justify-between">
-                    <span className="text-xs text-white/30">Status</span>
-                    <span className="flex items-center gap-1.5 text-xs text-emerald-400/80">
-                      <span className="inline-block h-1.5 w-1.5 rounded-full bg-emerald-400" />
-                      Connected
-                    </span>
-                  </div>
-                  <div className="h-px bg-white/[0.04]" />
-                  <div className="flex items-center justify-between">
-                    <span className="text-xs text-white/30">Segments</span>
-                    <span className="font-mono text-xs text-white/50">
-                      {transcript.length}
-                    </span>
-                  </div>
-                  <div className="h-px bg-white/[0.04]" />
-                  <div className="flex items-center justify-between">
-                    <span className="text-xs text-white/30">Model</span>
-                    <span className="text-xs text-white/50">
-                      Deepgram Nova-3
-                    </span>
-                  </div>
-                </div>
-              </>
-            ) : (
-              <>
+          {/* Screen capture preview */}
+          <div className="relative flex-1 border-b border-white/[0.06] bg-black/40">
+            <video
+              ref={videoRef}
+              autoPlay
+              playsInline
+              muted
+              className={`h-full w-full object-contain ${status === "active" || status === "requesting" ? "" : "hidden"}`}
+            />
+            {status !== "active" && status !== "requesting" && (
+              <div className="flex h-full flex-col items-center justify-center gap-4">
                 <div className="flex h-20 w-20 items-center justify-center rounded-2xl border border-dashed border-white/[0.08]">
                   <svg
                     className="h-8 w-8 text-white/10"
@@ -494,13 +468,56 @@ export default function LiveSupportPage() {
                   </svg>
                 </div>
                 <div className="text-center">
-                  <p className="text-sm text-white/25">No active session</p>
+                  <p className="text-sm text-white/25">No screen shared</p>
                   <p className="mt-1.5 text-xs leading-relaxed text-white/15">
-                    Click &quot;Start Session&quot; to share your screen and
-                    begin real-time transcription
+                    Click &quot;Start Session&quot; to share your
+                    <br />
+                    screen and begin capturing
                   </p>
                 </div>
-              </>
+              </div>
+            )}
+          </div>
+
+          {/* Bottom: Session info */}
+          <div className="shrink-0 px-5 py-4">
+            {status === "active" ? (
+              <div className="space-y-3">
+                <div className="flex items-center justify-between">
+                  <span className="text-xs text-white/30">Status</span>
+                  <span className="flex items-center gap-1.5 text-xs text-emerald-400/80">
+                    <span className="inline-block h-1.5 w-1.5 rounded-full bg-emerald-400" />
+                    Connected
+                  </span>
+                </div>
+                <div className="h-px bg-white/[0.04]" />
+                <div className="flex items-center justify-between">
+                  <span className="text-xs text-white/30">Duration</span>
+                  <span className="font-mono text-xs text-white/50">
+                    {formatElapsed(elapsed)}
+                  </span>
+                </div>
+                <div className="h-px bg-white/[0.04]" />
+                <div className="flex items-center justify-between">
+                  <span className="text-xs text-white/30">Segments</span>
+                  <span className="font-mono text-xs text-white/50">
+                    {transcript.length}
+                  </span>
+                </div>
+                <div className="h-px bg-white/[0.04]" />
+                <div className="flex items-center justify-between">
+                  <span className="text-xs text-white/30">Model</span>
+                  <span className="text-xs text-white/50">
+                    Deepgram Nova-3
+                  </span>
+                </div>
+              </div>
+            ) : (
+              <div className="flex items-center justify-center py-2">
+                <span className="text-xs text-white/20">
+                  Session info will appear here
+                </span>
+              </div>
             )}
           </div>
         </div>
