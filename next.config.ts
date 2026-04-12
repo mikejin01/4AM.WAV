@@ -11,6 +11,14 @@ const nextConfig: NextConfig = {
         protocol: "https",
         hostname: "dice-media.imgix.net",
       },
+      {
+        protocol: "https",
+        hostname: "posh.vip",
+      },
+      {
+        protocol: "https",
+        hostname: "posh-images-originals-production.s3.amazonaws.com",
+      },
     ],
   },
 };
