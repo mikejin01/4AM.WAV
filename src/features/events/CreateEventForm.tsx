@@ -4,6 +4,12 @@ import { useActionState } from "react";
 
 import { createEvent } from "./actions";
 
+const INPUT_CLASS =
+  "w-full rounded-lg border border-white/10 bg-white/5 px-4 py-3 text-sm text-white placeholder:text-white/25 focus:border-gold/50 focus:outline-none focus:ring-1 focus:ring-gold/30";
+
+const LABEL_CLASS =
+  "mb-1.5 block text-xs font-medium uppercase tracking-widest text-white/50";
+
 function Field({
   label,
   name,
@@ -19,10 +25,7 @@ function Field({
 }) {
   return (
     <div>
-      <label
-        htmlFor={name}
-        className="mb-1.5 block text-xs font-medium uppercase tracking-widest text-white/50"
-      >
+      <label htmlFor={name} className={LABEL_CLASS}>
         {label}
       </label>
       <input
@@ -31,8 +34,38 @@ function Field({
         type={type}
         placeholder={placeholder}
         required={required}
-        className="w-full rounded-lg border border-white/10 bg-white/5 px-4 py-3 text-sm text-white placeholder:text-white/25 focus:border-gold/50 focus:outline-none focus:ring-1 focus:ring-gold/30"
+        className={INPUT_CLASS}
       />
+    </div>
+  );
+}
+
+function DateTimeFields({
+  label,
+  dateName,
+  timeName,
+}: {
+  label: string;
+  dateName: string;
+  timeName: string;
+}) {
+  return (
+    <div>
+      <span className={LABEL_CLASS}>{label}</span>
+      <div className="grid grid-cols-[1fr_auto] gap-2">
+        <input
+          name={dateName}
+          type="date"
+          required
+          className={`${INPUT_CLASS} date-input cursor-pointer`}
+        />
+        <input
+          name={timeName}
+          type="time"
+          required
+          className={`${INPUT_CLASS} time-input w-[120px] cursor-pointer`}
+        />
+      </div>
     </div>
   );
 }
@@ -58,10 +91,7 @@ export default function CreateEventForm() {
       />
 
       <div>
-        <label
-          htmlFor="description"
-          className="mb-1.5 block text-xs font-medium uppercase tracking-widest text-white/50"
-        >
+        <label htmlFor="description" className={LABEL_CLASS}>
           Description
         </label>
         <textarea
@@ -69,7 +99,7 @@ export default function CreateEventForm() {
           name="description"
           rows={4}
           placeholder="Tell people about the event..."
-          className="w-full rounded-lg border border-white/10 bg-white/5 px-4 py-3 text-sm text-white placeholder:text-white/25 focus:border-gold/50 focus:outline-none focus:ring-1 focus:ring-gold/30"
+          className={INPUT_CLASS}
         />
       </div>
 
@@ -96,17 +126,15 @@ export default function CreateEventForm() {
       </div>
 
       <div className="grid gap-6 sm:grid-cols-2">
-        <Field
-          label="Start Date & Time"
-          name="starts_at"
-          type="datetime-local"
-          required
+        <DateTimeFields
+          label="Starts"
+          dateName="start_date"
+          timeName="start_time"
         />
-        <Field
-          label="End Date & Time"
-          name="ends_at"
-          type="datetime-local"
-          required
+        <DateTimeFields
+          label="Ends"
+          dateName="end_date"
+          timeName="end_time"
         />
       </div>
 

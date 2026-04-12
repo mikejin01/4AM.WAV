@@ -348,3 +348,15 @@ body {
     transform: translateY(0);
   }
 }
+
+/* Dark-themed native date/time inputs */
+.date-input::-webkit-calendar-picker-indicator,
+.time-input::-webkit-calendar-picker-indicator {
+  filter: invert(1) brightness(0.7);
+  cursor: pointer;
+}
+
+input[type="date"],
+input[type="time"] {
+  color-scheme: dark;
+}
