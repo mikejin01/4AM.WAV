@@ -3,11 +3,8 @@
 import { useEffect, useRef, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
-import { createClient } from "@/lib/supabase/client";
 
 import type { EventDetail as EventDetailType } from "./types";
-import TicketModal from "./TicketModal";
 
 function formatDate(startsAt: string) {
   const start = new Date(startsAt);
@@ -29,11 +26,6 @@ function formatTime(startsAt: string, endsAt: string) {
       .toUpperCase();
 
   return `${fmt(start)} – ${fmt(end)}`;
-}
-
-function formatPrice(cents: number) {
-  if (cents === 0) return "Free";
-  return `$${(cents / 100).toFixed(2)}`;
 }
 
 function extractDominantColor(
@@ -64,7 +56,6 @@ function extractDominantColor(
   g = Math.round(g / count);
   b = Math.round(b / count);
 
-  // Darken the color for the background
   const darken = 0.35;
   return [
     Math.round(r * darken),
@@ -75,10 +66,8 @@ function extractDominantColor(
 
 export default function EventDetail({ event }: { event: EventDetailType }) {
   const [bgColor, setBgColor] = useState("rgb(10, 5, 20)");
-  const [modalOpen, setModalOpen] = useState(false);
   const imgRef = useRef<HTMLImageElement>(null);
   const extractedRef = useRef(false);
-  const router = useRouter();
 
   useEffect(() => {
     if (!event.image_url || extractedRef.current) return;
@@ -92,12 +81,6 @@ export default function EventDetail({ event }: { event: EventDetailType }) {
       extractedRef.current = true;
     };
   }, [event.image_url]);
-
-  const lowestTier = event.ticket_tiers.length
-    ? event.ticket_tiers.reduce((a, b) =>
-        a.price_cents <= b.price_cents ? a : b
-      )
-    : null;
 
   return (
     <main className="relative min-h-screen overflow-hidden">
@@ -213,59 +196,36 @@ export default function EventDetail({ event }: { event: EventDetailType }) {
               </div>
             </div>
 
-            {/* Ticket info */}
-            {event.ticket_tiers.length > 0 && (
-              <div className="rounded-xl border border-white/10 bg-white/5 p-5">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="text-sm text-white/50">
-                      {lowestTier && lowestTier.price_cents === 0
-                        ? "This is a free event"
-                        : event.ticket_tiers.length > 1
-                          ? "Starting from"
-                          : "Price"}
-                    </p>
-                    <p className="text-2xl font-bold text-white">
-                      {lowestTier
-                        ? formatPrice(lowestTier.price_cents)
-                        : "TBA"}
-                    </p>
-                  </div>
-                  <button
-                    onClick={async () => {
-                      const supabase = createClient();
-                      const { data: { user } } = await supabase.auth.getUser();
-                      if (!user) {
-                        router.push("/login");
-                        return;
-                      }
-                      setModalOpen(true);
-                    }}
-                    className="rounded-lg bg-gold px-6 py-2.5 text-sm font-bold uppercase tracking-wider text-black transition-colors hover:bg-gold-light"
+            {/* Ticket link */}
+            <div className="rounded-xl border border-white/10 bg-white/5 p-5">
+              {event.ticket_url ? (
+                <a
+                  href={event.ticket_url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex w-full items-center justify-center gap-2 rounded-lg bg-gold px-6 py-3 text-sm font-bold uppercase tracking-wider text-black transition-colors hover:bg-gold-light"
+                >
+                  Buy Tickets
+                  <svg
+                    className="h-4 w-4"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    strokeWidth={2}
+                    stroke="currentColor"
                   >
-                    {lowestTier && lowestTier.price_cents === 0
-                      ? "RSVP"
-                      : "Buy Now"}
-                  </button>
-                </div>
-
-                {event.ticket_tiers.length > 1 && (
-                  <div className="mt-4 space-y-2 border-t border-white/10 pt-4">
-                    {event.ticket_tiers.map((tier) => (
-                      <div
-                        key={tier.id}
-                        className="flex items-center justify-between text-sm"
-                      >
-                        <span className="text-white/70">{tier.name}</span>
-                        <span className="font-medium text-white">
-                          {formatPrice(tier.price_cents)}
-                        </span>
-                      </div>
-                    ))}
-                  </div>
-                )}
-              </div>
-            )}
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      d="M13.5 6H5.25A2.25 2.25 0 003 8.25v10.5A2.25 2.25 0 005.25 21h10.5A2.25 2.25 0 0018 18.75V10.5m-10.5 6L21 3m0 0h-5.25M21 3v5.25"
+                    />
+                  </svg>
+                </a>
+              ) : (
+                <p className="text-center text-sm text-white/40">
+                  Tickets coming soon
+                </p>
+              )}
+            </div>
 
             {/* Description */}
             {event.description && (
@@ -279,12 +239,6 @@ export default function EventDetail({ event }: { event: EventDetailType }) {
           </div>
         </div>
       </div>
-
-      <TicketModal
-        event={event}
-        open={modalOpen}
-        onClose={() => setModalOpen(false)}
-      />
     </main>
   );
 }

@@ -23,6 +23,7 @@ export default async function EventDetailPage({
       venue_address,
       starts_at,
       ends_at,
+      ticket_url,
       ticket_tiers ( id, name, price_cents, quantity, sold_count )
     `
     )

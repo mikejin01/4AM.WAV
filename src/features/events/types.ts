@@ -14,6 +14,7 @@ export type EventSummary = {
   venue_address: string;
   starts_at: string;
   ends_at: string;
+  ticket_url: string | null;
   ticket_tiers: Pick<TicketTier, "id" | "name" | "price_cents">[];
 };
 
@@ -26,5 +27,6 @@ export type EventDetail = {
   venue_address: string;
   starts_at: string;
   ends_at: string;
+  ticket_url: string | null;
   ticket_tiers: TicketTier[];
 };
