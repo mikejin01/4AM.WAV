@@ -5,8 +5,8 @@ const envSchema = z.object({
   STRIPE_SECRET_KEY: z.string().min(1),
   STRIPE_WEBHOOK_SECRET: z.string().optional().default(""),
   STRIPE_VIP_PRICE_ID: z.string().min(1),
-  DEEPGRAM_API_KEY: z.string().min(1),
-  LIVE_SUPPORT_SECRET: z.string().min(32),
+  DEEPGRAM_API_KEY: z.string().optional().default(""),
+  LIVE_SUPPORT_SECRET: z.string().optional().default(""),
 });
 
 export const serverEnv = envSchema.parse({
