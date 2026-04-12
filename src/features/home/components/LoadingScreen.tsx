@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef } from "react";
+import Image from "next/image";
 
 const TOTAL_DURATION_MS = 2400;
 
@@ -32,26 +33,16 @@ export default function LoadingScreen({
       <div className="loading-glow pointer-events-none absolute left-1/2 top-1/2 h-[400px] w-[400px] -translate-x-1/2 -translate-y-1/2 rounded-full bg-gold/[0.06] blur-[120px]" />
 
       <div className="relative flex flex-col items-center">
-        {/* Large brand text */}
-        <div className="flex items-baseline gap-0">
-          {"4AM".split("").map((char, i) => (
-            <span
-              key={i}
-              className="loading-char font-heading text-[clamp(4rem,15vw,10rem)] font-bold leading-none text-white"
-              style={{ "--char-index": i } as React.CSSProperties}
-            >
-              {char}
-            </span>
-          ))}
-        </div>
-
-        {/* .WAV subtitle with gold accent */}
-        <div className="loading-subtitle mt-1 flex items-center gap-3">
-          <span className="loading-line h-px w-8 bg-gold" />
-          <span className="font-mono text-sm tracking-[0.5em] text-gold/70">
-            .WAV
-          </span>
-          <span className="loading-line h-px w-8 bg-gold" />
+        {/* Logo */}
+        <div className="loading-subtitle">
+          <Image
+            src="/assets/logos/4am-logo-cropped.png"
+            alt="4AM.WAV"
+            width={2248}
+            height={441}
+            priority
+            className="h-[clamp(2rem,8vw,4rem)] w-auto"
+          />
         </div>
 
         {/* Waveform visualization */}
@@ -59,7 +50,7 @@ export default function LoadingScreen({
           {Array.from({ length: 24 }).map((_, i) => (
             <div
               key={i}
-              className="loading-wave-bar w-[2px] rounded-full bg-white/20"
+              className="loading-wave-bar w-[2px] rounded-full bg-gold/60"
               style={{ "--wave-index": i } as React.CSSProperties}
             />
           ))}

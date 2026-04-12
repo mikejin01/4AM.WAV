@@ -1,8 +1,8 @@
 import { NextResponse } from "next/server";
 import type Stripe from "stripe";
-import { stripe } from "@/lib/integrations/stripe/server";
+import { stripe } from "@/lib/stripe/server";
 import { serverEnv } from "@/lib/env.server";
-import { createClient } from "@/lib/integrations/supabase/server";
+import { createClient } from "@/lib/supabase/server";
 
 export async function POST(request: Request) {
   const body = await request.text();

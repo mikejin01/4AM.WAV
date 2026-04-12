@@ -4,7 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { createClient } from "@/lib/integrations/supabase/client";
+import { createClient } from "@/lib/supabase/client";
 
 import type { EventDetail as EventDetailType } from "./types";
 import TicketModal from "./TicketModal";

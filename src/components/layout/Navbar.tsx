@@ -4,7 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import type { User } from "@supabase/supabase-js";
-import { createClient } from "@/lib/integrations/supabase/client";
+import { createClient } from "@/lib/supabase/client";
 
 function UserMenu({
   user,
@@ -118,8 +118,14 @@ export default function Navbar() {
 
   return (
     <nav className="fixed top-0 left-0 right-0 z-40 flex items-center justify-between px-6 py-5 sm:px-10">
-      <Link href="/" className="text-xl font-bold tracking-wider text-white">
-        4AM.WAV
+      <Link href="/">
+        <Image
+          src="/assets/logos/4am-logo-cropped.png"
+          alt="4AM.WAV"
+          width={2248}
+          height={441}
+          className="h-5 w-auto"
+        />
       </Link>
 
       {/* Desktop nav */}
@@ -184,12 +190,14 @@ export default function Navbar() {
         }`}
       >
         <div className="flex items-center justify-between px-6 py-5 sm:px-10">
-          <Link
-            href="/"
-            className="text-xl font-bold tracking-wider text-white"
-            onClick={() => setMenuOpen(false)}
-          >
-            4AM.WAV
+          <Link href="/" onClick={() => setMenuOpen(false)}>
+            <Image
+              src="/assets/logos/4am-logo-cropped.png"
+              alt="4AM.WAV"
+              width={2248}
+              height={441}
+              className="h-5 w-auto"
+            />
           </Link>
           <button
             onClick={() => setMenuOpen(false)}

@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import Link from "next/link";
 
 import { useScrollReveal } from "../hooks/useScrollReveal";
@@ -62,9 +63,13 @@ export default function CTAFooter() {
       <footer className="border-t border-white/[0.06] px-6 py-12 sm:py-16">
         <div className="mx-auto flex max-w-6xl flex-col items-center gap-10 sm:flex-row sm:items-start sm:justify-between">
           <div className="text-center sm:text-left">
-            <p className="font-mono text-sm tracking-wider text-white/50">
-              4AM.WAV
-            </p>
+            <Image
+              src="/assets/logos/4am-logo-cropped.png"
+              alt="4AM.WAV"
+              width={2248}
+              height={441}
+              className="h-5 w-auto sm:h-6"
+            />
             <p className="mt-2 text-xs text-white/25">
               Where the night lives.
             </p>

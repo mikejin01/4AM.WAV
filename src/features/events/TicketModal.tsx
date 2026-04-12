@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import Image from "next/image";
-import { createClient } from "@/lib/integrations/supabase/client";
+import { createClient } from "@/lib/supabase/client";
 
 import type { EventDetail } from "./types";
 

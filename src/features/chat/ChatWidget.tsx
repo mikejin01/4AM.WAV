@@ -38,7 +38,7 @@ export default function ChatWidget() {
     }, 600);
   }
 
-  function handleSend() {
+  async function handleSend() {
     const text = input.trim();
     if (!text) return;
 
@@ -51,13 +51,23 @@ export default function ChatWidget() {
     const lower = text.toLowerCase();
 
     if (awaitingPassword) {
-      if (text === "888") {
-        addBotMessage("Access granted. Redirecting...");
-        setTimeout(() => router.push("/live-support"), 1200);
-      } else {
-        addBotMessage("Incorrect password. Try again.");
-      }
       setAwaitingPassword(false);
+      try {
+        const res = await fetch("/api/live-support/activate", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ password: text }),
+        });
+
+        if (res.ok) {
+          addBotMessage("Access granted. Redirecting...");
+          setTimeout(() => router.push("/live-support"), 1200);
+        } else {
+          addBotMessage("Incorrect password. Try again.");
+        }
+      } catch {
+        addBotMessage("Something went wrong. Try again.");
+      }
       return;
     }
 

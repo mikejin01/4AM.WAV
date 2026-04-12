@@ -1,7 +1,7 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
-import { createClient } from "@/lib/integrations/supabase/server";
+import { createClient } from "@/lib/supabase/server";
 
 export async function updatePhone(formData: FormData) {
   const phone = formData.get("phone") as string | null;

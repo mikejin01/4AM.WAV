@@ -6,6 +6,7 @@ const envSchema = z.object({
   STRIPE_WEBHOOK_SECRET: z.string().optional().default(""),
   STRIPE_VIP_PRICE_ID: z.string().min(1),
   DEEPGRAM_API_KEY: z.string().min(1),
+  LIVE_SUPPORT_SECRET: z.string().min(32),
 });
 
 export const serverEnv = envSchema.parse({
@@ -13,4 +14,5 @@ export const serverEnv = envSchema.parse({
   STRIPE_WEBHOOK_SECRET: process.env.STRIPE_WEBHOOK_SECRET,
   STRIPE_VIP_PRICE_ID: process.env.STRIPE_VIP_PRICE_ID,
   DEEPGRAM_API_KEY: process.env.DEEPGRAM_API_KEY,
+  LIVE_SUPPORT_SECRET: process.env.LIVE_SUPPORT_SECRET,
 });
