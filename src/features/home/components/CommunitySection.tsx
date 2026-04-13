@@ -1,5 +1,6 @@
 "use client";
 
+import { useEffect, useRef, useState } from "react";
 import Image from "next/image";
 
 import { useScrollReveal } from "../hooks/useScrollReveal";
@@ -47,8 +48,29 @@ function GalleryCard({
   visible: boolean;
   delay: number;
 }) {
+  const cardRef = useRef<HTMLDivElement>(null);
+  const [inView, setInView] = useState(false);
+
+  useEffect(() => {
+    if (!video) return;
+    const el = cardRef.current;
+    if (!el) return;
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          setInView(true);
+          observer.disconnect();
+        }
+      },
+      { rootMargin: "200px" },
+    );
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, [video]);
+
   return (
     <div
+      ref={cardRef}
       className={`group relative overflow-hidden rounded-xl transition-all duration-700 ease-out ${className}`}
       style={{
         opacity: visible ? 1 : 0,
@@ -57,21 +79,24 @@ function GalleryCard({
       }}
     >
       {video ? (
-        <video
-          src={video}
-          autoPlay
-          loop
-          muted
-          playsInline
-          className={`absolute inset-0 h-full w-full object-cover transition-transform duration-500 ${
-            videoScale ? "" : "group-hover:scale-105"
-          }`}
-          style={
-            videoScale
-              ? { transform: `scale(${videoScale})`, transformOrigin: "center" }
-              : undefined
-          }
-        />
+        inView && (
+          <video
+            src={video}
+            autoPlay
+            loop
+            muted
+            playsInline
+            preload="metadata"
+            className={`absolute inset-0 h-full w-full object-cover transition-transform duration-500 ${
+              videoScale ? "" : "group-hover:scale-105"
+            }`}
+            style={
+              videoScale
+                ? { transform: `scale(${videoScale})`, transformOrigin: "center" }
+                : undefined
+            }
+          />
+        )
       ) : (
         <Image
           src={image!}

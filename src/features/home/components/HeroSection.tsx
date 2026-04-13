@@ -55,9 +55,9 @@ export default function HeroSection({ animate }: { animate: boolean }) {
           muted
           loop
           playsInline
-          preload="auto"
+          preload="metadata"
           className="h-full w-full object-cover"
-          src="/assets/home/hero-video.MP4"
+          src="/assets/home/hero-video.mp4"
           poster="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg'/%3E"
         />
         {/* Overlays for text legibility over video */}
