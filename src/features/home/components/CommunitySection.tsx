@@ -24,7 +24,7 @@ const GALLERY_ITEMS = [
   },
   {
     label: "EVOL / SoHo",
-    image: "/assets/home/community-evol-1.webp",
+    image: "/assets/home/venue-evol-1.webp",
   },
 ];
 

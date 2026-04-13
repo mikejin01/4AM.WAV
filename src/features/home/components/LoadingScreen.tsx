@@ -3,7 +3,7 @@
 import { useEffect, useRef } from "react";
 import Image from "next/image";
 
-const TOTAL_DURATION_MS = 2400;
+const TOTAL_DURATION_MS = 1600;
 
 export default function LoadingScreen({
   onComplete,

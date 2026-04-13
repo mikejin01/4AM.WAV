@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Geist, Geist_Mono, Bricolage_Grotesque } from "next/font/google";
 import "@/styles/globals.css";
 import ChatWidget from "@/features/chat/ChatWidget";
@@ -18,6 +18,11 @@ const bricolage = Bricolage_Grotesque({
   subsets: ["latin"],
   display: "swap",
 });
+
+export const viewport: Viewport = {
+  width: "device-width",
+  initialScale: 1,
+};
 
 export const metadata: Metadata = {
   title: "4AM.WAV — Where the Night Lives",

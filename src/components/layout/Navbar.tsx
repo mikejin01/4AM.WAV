@@ -21,13 +21,17 @@ function UserMenu({
   const avatar: string | undefined = user.user_metadata?.avatar_url;
 
   useEffect(() => {
-    function handleClickOutside(e: MouseEvent) {
+    function handleClickOutside(e: MouseEvent | TouchEvent) {
       if (menuRef.current && !menuRef.current.contains(e.target as Node)) {
         setOpen(false);
       }
     }
     document.addEventListener("mousedown", handleClickOutside);
-    return () => document.removeEventListener("mousedown", handleClickOutside);
+    document.addEventListener("touchstart", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+      document.removeEventListener("touchstart", handleClickOutside);
+    };
   }, []);
 
   return (
@@ -164,7 +168,7 @@ export default function Navbar() {
       {/* Mobile hamburger */}
       <button
         onClick={() => setMenuOpen(!menuOpen)}
-        className="flex flex-col gap-1.5 md:hidden"
+        className="flex min-h-11 min-w-11 flex-col items-center justify-center gap-1.5 md:hidden"
         aria-label="Toggle menu"
       >
         <span
@@ -186,7 +190,7 @@ export default function Navbar() {
 
       {/* Mobile drawer */}
       <div
-        className={`fixed inset-0 top-0 z-30 flex flex-col bg-black/95 backdrop-blur-md transition-transform duration-300 md:hidden ${
+        className={`fixed inset-0 top-0 z-50 flex flex-col bg-black/95 backdrop-blur-md transition-transform duration-300 md:hidden ${
           menuOpen ? "translate-x-0" : "translate-x-full"
         }`}
       >
@@ -202,7 +206,7 @@ export default function Navbar() {
           </Link>
           <button
             onClick={() => setMenuOpen(false)}
-            className="text-2xl text-white"
+            className="flex min-h-11 min-w-11 items-center justify-center text-2xl text-white"
             aria-label="Close menu"
           >
             &times;
